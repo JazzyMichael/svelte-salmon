@@ -10,6 +10,8 @@
   import firebaseConfig from './firebase.config.js';
 
   firebase.initializeApp(firebaseConfig);
+
+  import PostForm from './PostForm.svelte';
 </script>
 
 <main>
@@ -20,9 +22,22 @@
     <h1>💪🔥 Svelte Salmon 🔥💪</h1>
 
 
+    <Collection
+      path={'posts'}
+      query={ref => ref.orderBy('createdAt')}
+      let:data={posts}
+      let:ref={postsRef}>
+
+      {#each posts as post}
+        <p style="padding: 1em; border: 3px solid black; margin: 1em;">{post.title}</p>
+      {/each}
+    </Collection>
+
+    <br><br>
+
     <!-- 2. 😀 Get the current user -->
     <User let:user let:auth>
-      Howdy 😀! User
+      User
       <em>{user.uid}</em>
 
       <button on:click={() => auth.signOut()}>Sign Out</button>
@@ -48,6 +63,13 @@
 
         <span slot="loading">Loading post...</span>
         <span slot="fallback">
+          
+          <br>
+
+          <PostForm />
+
+          <br>
+
           <button
             on:click={() => postRef.set({
                 title: '📜 I like Svelte',
