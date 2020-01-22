@@ -43,7 +43,6 @@
       <button on:click={() => auth.signOut()}>Sign Out</button>
 
       <div slot="signed-out">
-
         <button on:click={() => auth.signInAnonymously()}>
           Sign In Anonymously
         </button>
@@ -63,20 +62,12 @@
 
         <span slot="loading">Loading post...</span>
         <span slot="fallback">
-          
-          <br>
-
-          <PostForm />
 
           <br>
 
-          <button
-            on:click={() => postRef.set({
-                title: '📜 I like Svelte',
-                createdAt: Date.now()
-              })}>
-            Create Document
-          </button>
+          <PostForm userId={user.uid} on:submit={({ detail }) => postRef.set(detail)} />
+
+          <br>
         </span>
 
         <!-- 4. 💬 Get all the comments in its subcollection -->
