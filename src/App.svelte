@@ -12,6 +12,7 @@
   firebase.initializeApp(firebaseConfig);
 
   import PostForm from './PostForm.svelte';
+  import CommentForm from './CommentForm.svelte';
 
   let viewingPost;
 </script>
@@ -38,7 +39,7 @@
       <h3>Comments</h3>
       <Collection
         path={'posts/' + viewingPost.id + '/comments'}
-        query={ref => ref.orderBy('createdAt')}
+        query={ref => ref.orderBy('createdAt').limit(10)}
         let:data={comments}
         let:ref={commentsRef}>
 
@@ -56,22 +57,22 @@
           </p>
         {/each}
 
+        <br>
 
-        <button
-          on:click={() => commentsRef.add({
-              text: '💬 Me tootoo!',
-              createdAt: Date.now()
-            })}>
-          Add Comment
-        </button>
-
-        <span slot="loading">Loading comments...</span>
-
+        <User let:user let:auth>
+          <CommentForm userId={user.uid} on:submit={({ detail }) => commentsRef.add(detail)} />
+          <div slot="signed-out">
+            <p>💬 you gotta be signed in to comment 💬</p>
+            <button on:click={() => auth.signInAnonymously()}>
+              Sign In Anonymously
+            </button>
+          </div>
+        </User>
       </Collection>
     {:else}
       <Collection
         path={'posts'}
-        query={ref => ref.orderBy('createdAt')}
+        query={ref => ref.orderBy('createdAt').limit(10)}
         let:data={posts}
         let:ref={postsRef}>
 
@@ -89,7 +90,6 @@
         <br>
 
         <User let:user let:auth>
-
           <hr />
 
           User <em>{user.uid}</em>
@@ -107,7 +107,6 @@
           </div>
 
           <hr />
-
         </User>
       </Collection>
     {/if}

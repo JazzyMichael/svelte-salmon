@@ -5,13 +5,11 @@
 
     export let userId;
 
-    let title = '';
-    let description = '';
+    let text = '';
 
     const submit = () => {
         dispatch('submit', {
-            title,
-            description,
+            text,
             userId,
             createdAt: Date.now()
         });
@@ -19,16 +17,13 @@
     }
 
     const resetInputs = () => {
-        title = '';
-        description = '';
+        text = '';
     }
 </script>
 
-<input bind:value={title} type="text" placeholder="Title">
+<input bind:value={text} type="text" placeholder="Title">
 
-<textarea bind:value={description} rows="3" placeholder="Description"></textarea>
-
-<button on:click={submit} disabled={!title || !description || !userId}>😀 Submit</button>
+<button on:click={submit} disabled={!text || !userId}>📜 Add Comment</button>
 
 <style>
 * {
