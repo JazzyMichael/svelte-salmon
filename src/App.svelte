@@ -14,6 +14,8 @@
   import PostForm from './PostForm.svelte';
   import CommentForm from './CommentForm.svelte';
 
+	import { flip } from 'svelte/animate';
+
   let viewingPost;
 </script>
 
@@ -22,15 +24,15 @@
 
   <FirebaseApp {firebase}>
 
-    <h1>💪🔥 Svelte Salmon 🔥💪</h1>
+    <h1>💪🔥 Svelte & Salmon 🔥💪</h1>
 
     {#if viewingPost}
 
       <p>{viewingPost.title}</p>
       <p>{viewingPost.description}</p>
       <p>{new Date(viewingPost.createdAt).toLocaleString()}</p>
-      <p>User ID: {viewingPost.userId}</p>
-      <p>Post ID: {viewingPost.id}</p>
+      <p>Poster ID: {viewingPost.userId}</p>
+      <!-- <p>Post ID: {viewingPost.id}</p> -->
       
       <button on:click={() => viewingPost = null}>{'<-- View All'}</button>
 
@@ -47,11 +49,8 @@
             No comments yet...
         {/if}
 
-        {#each comments as comment}
-          <p>
-            <!-- ID: <em>{comment.ref.id}</em> -->
-          </p>
-          <p>
+        {#each comments as comment (comment.id)}
+          <p animate:flip>
             {comment.text}
             <button on:click={() => comment.ref.delete()}>Delete</button>
           </p>
@@ -72,12 +71,27 @@
     {:else}
       <Collection
         path={'posts'}
-        query={ref => ref.orderBy('createdAt').limit(10)}
+        query={ref => ref.orderBy('createdAt', 'desc').limit(10)}
         let:data={posts}
         let:ref={postsRef}>
 
-        {#each posts as post}
-          <div on:click={() => viewingPost = post} style="padding: 1em; border: 3px solid black; margin: 1em;">
+        <User let:user let:auth>
+          <hr />
+          User <em>{user.uid}</em>
+          <button on:click={() => auth.signOut()}>Sign Out</button>
+          <br>
+          <h3>New Post</h3>
+          <PostForm userId={user.uid} on:submit={({ detail }) => postsRef.add(detail)} />
+          <div slot="signed-out">
+            <button on:click={() => auth.signInAnonymously()}>
+              Sign In Anonymously
+            </button>
+          </div>
+          <hr />
+        </User>
+
+        {#each posts as post (post.id)}
+          <div animate:flip on:click={() => viewingPost = post} style="padding: 1em; border: 3px solid black; margin: 1em; background: white;">
             <h3>{post.title}</h3>
             <p>{post.description}</p>
             <div style="display: flex; justify-content: space-around; align-items: center;">
@@ -86,33 +100,9 @@
             </div>
           </div>
         {/each}
-
-        <br>
-
-        <User let:user let:auth>
-          <hr />
-
-          User <em>{user.uid}</em>
-
-          <button on:click={() => auth.signOut()}>Sign Out</button>
-
-          <br><br>
-
-          <PostForm userId={user.uid} on:submit={({ detail }) => postsRef.add(detail)} />
-
-          <div slot="signed-out">
-            <button on:click={() => auth.signInAnonymously()}>
-              Sign In Anonymously
-            </button>
-          </div>
-
-          <hr />
-        </User>
       </Collection>
     {/if}
-
   </FirebaseApp>
-
 </main>
 
 
