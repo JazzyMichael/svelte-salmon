@@ -1,6 +1,6 @@
 
 
-## The Art of Cooking Salmon
+## Salmon Fun with Svelte
 
 Made with Svelte & Firebase
 
